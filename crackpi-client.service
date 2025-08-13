@@ -1,0 +1,36 @@
+[Unit]
+Description=CrackPi Distributed Password Cracking Client
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/crackpi
+Environment=PYTHONPATH=/home/pi/crackpi
+Environment=CRACKPI_SERVER_URL=http://localhost:5000
+ExecStart=/home/pi/crackpi/venv/bin/python enhanced_client.py --server $CRACKPI_SERVER_URL
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=10
+KillMode=process
+TimeoutStopSec=30
+
+# Resource limits - Allow 95% CPU for cracking
+CPUQuota=95%
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/pi/crackpi /var/log/crackpi
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=crackpi-client
+
+[Install]
+WantedBy=multi-user.target

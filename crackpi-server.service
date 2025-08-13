@@ -1,0 +1,39 @@
+[Unit]
+Description=CrackPi Distributed Password Cracking Server
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/crackpi
+Environment=PYTHONPATH=/home/pi/crackpi
+Environment=DATABASE_URL=sqlite:///crackpi.db
+Environment=SESSION_SECRET=crackpi-production-secret-change-me
+Environment=FLASK_ENV=production
+ExecStart=/home/pi/crackpi/venv/bin/python main.py
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+KillMode=process
+TimeoutStopSec=30
+
+# Resource limits
+CPUQuota=80%
+MemoryLimit=512M
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/pi/crackpi
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=crackpi-server
+
+[Install]
+WantedBy=multi-user.target
